@@ -1,2 +1,2 @@
-# Steganography-
+# Steganography
 Steganography in matlab for Audio
