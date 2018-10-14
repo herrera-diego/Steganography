@@ -1,10 +1,13 @@
 % Module Name:  Codificador
 % Project:      Esteganografo
 % 
-% La esteganografía procura ocultar mensajes dentro de otros objetos y de 
-% esta forma establecer un canal encubierto de comunicación, de modo que el
-% propio acto de la comunicación pase inadvertido para observadores que 
-% tienen acceso a ese canal.
+% Convierte un "string" llamado "hiddenMessage" a su equivalente en bits
+% y por cada muestra de la señal de audio sustituye su LSB por uno de los 
+% bits del mensaje secreto.
+%
+% Cada "char" del mensaje secreto se combierte a vectores de 16 bits, es
+% decir se requieren de al menos 16 muestras de audio para esconder su
+% informacion
 
 %% Init
 
@@ -46,8 +49,8 @@ for i = 1:hiddenMessage_length
     %%%% DEBUG - Check value that was read
     %charInDouble = Binary2Double(charInBinary);
    
-    % Foreach bit in the binary array, override the LSB of the original
-    % signal samples
+    % Foreach bit in the binary array, override the LSB of 1 audio sample.
+    % 16 samples are required per "char"
     for j = 1:length(charInBinary)
        sampleNumber = sampleNumber+1;
        
@@ -61,9 +64,11 @@ for i = 1:hiddenMessage_length
        % Override LSB with ascii bit
        LSB = 16;
        sampleInBinary(1,LSB) = charInBinary(1,j);
+       
+       % Recalculate sample double value after changing LSB
        sampleInDouble = Binary2Double(sampleInBinary);
        
-       % Override sampled input signal
+       % Override sample original value
        y(row,column) = sampleInDouble;      
     end   
 end
@@ -82,7 +87,7 @@ audiowrite(outputFilename,y,Fs);
 % Original file
 sound(y,Fs); 
 
-% Modificatied file
+% Modified file
 pause(1);
 sound(y4,Fs); 
 

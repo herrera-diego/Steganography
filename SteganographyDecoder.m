@@ -1,10 +1,11 @@
 % Module Name:  Decodificador
 % Project:      Esteganografo
 % 
-% La esteganografía procura ocultar mensajes dentro de otros objetos y de 
-% esta forma establecer un canal encubierto de comunicación, de modo que el
-% propio acto de la comunicación pase inadvertido para observadores que 
-% tienen acceso a ese canal.
+% 1. Lee .WAV modificado
+% 2. Lee el bit menos significativo de "char*16" muestras y lo guarda en un 
+%    vector
+% 3. Combierte cada 16 bits en un double (ASCII)
+% 4. Combierte ASCII a char para formar el mensaje secreto
 
 %% Init
 
