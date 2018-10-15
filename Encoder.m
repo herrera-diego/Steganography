@@ -11,6 +11,8 @@ album = 'None';
 
 %% System Parameters
 
+ q = quantizer([4,3]);
+
 % Total Samples
 totalSamples = size(y,1);
 
@@ -29,16 +31,13 @@ v = mat2cell(yr,diff([0:samplesSegment:totalSamples-1,totalSamples]));
 
 %% Combination
 for i = 1:numSegments
-    vn = v{i,1};
-    charEncoded = Double2Binary(totalChar(i));
+    vn = v{i,1};   
+    charEncoded = typecast(totalCharNum(i), 'uint8');
     
-    for j = 1:length(charEncoded)
-      
-       sample = Double2Binary(vn(j));
-       sampleSize = 16;
-       sample(1,sampleSize) = charEncoded(1,j);
-       data = Binary2Double(sample);
-       vn(j) = data;      
+    for j = 1:length(charEncoded)      
+       sample = typecast(vn(j), 'uint8');  
+       sample(1) = charEncoded(j);
+       vn(j) =  typecast(sample, 'double'); 
     end   
     
     v{i,1} = vn;
