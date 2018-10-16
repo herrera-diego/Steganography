@@ -1,6 +1,6 @@
 %% User Inputs
-audioFile = 'Canon_Rock.mp3';
-audioFileOut = 'Canon_Rock_new.wav';
+audioFile = 'AudioDePrueba.wav';
+audioFileOut = 'test.wav';
 title = "Canon Rock";
 artist = "JerryC";
 album = "None";
@@ -50,9 +50,10 @@ for i = 1:numSegments
 end
 
 %% Audio Export
-ys(totalSamples) =  typecast(numSegments, 'double'); 
+ys(totalSamples) =  numSegments/100; 
 outSig = y;
 outSig(:,1) = ys;
 audiowrite(audioFileOut,outSig,Fs);
 
 [yo,Fso] = audioread(audioFileOut);
+
