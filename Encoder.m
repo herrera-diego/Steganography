@@ -16,44 +16,51 @@ userInputs = [title; artist; album];
 totalSamples = size(y,1);
 
 % Number of segments
-numSegments = length(userInputs);
+numSegments = 1000;
 
 % Block Size
 samplesSegment = ceil(totalSamples/numSegments);
 
 %% Window
-yr=y(:,1);
-ys = yr;
-v = mat2cell(yr,diff([0:samplesSegment:totalSamples-1,totalSamples]));
-
-%% Combination
-for i = 1:numSegments
+v = mat2cell(y(:,1),diff([0:samplesSegment:totalSamples-1,totalSamples]));
+vo = v;
+for i = 1:length(userInputs)
     vn = v{i,1};   
     metadata = char(userInputs(i));
     metadataNum = double(metadata);
-    metadataLength = typecast(vn(1), 'uint8'); 
-    metadataLength(1)= length(metadataNum);
-    vn(1) =  typecast(metadataLength, 'double'); 
-    
+
     for j = 1:length(metadataNum)
-   
+
         charEncoded = typecast(metadataNum(j), 'uint8');
-        
-        for k = 1:length(charEncoded)      
-           sample = typecast(vn(k+1), 'uint8');  
-           sample(1) = charEncoded(k);
-           vn(k+1) =  typecast(sample, 'double'); 
+        charBin = dec2bin(charEncoded,8);
+
+        for k = 1:length(charBin)  
+        %% Mux
+        thisBit = char(charBin(k));
+        if(thisBit)
+            %H1(z)
+            t = 5;
+            a = 0;
+            h = createH();
+        else
+            %H0(z)
+            t = 1;
+            a = 1;
+            h = createH();
+        end
+
+        %% Combination
+
         end   
-    end
-    v{i,1} = vn;
-    ys(i:(i+size(vn)-1)) = vn;
+    end    
 end
 
-%% Audio Export
-ys(totalSamples) =  numSegments/100; 
-outSig = y;
-outSig(:,1) = ys;
-audiowrite(audioFileOut,outSig,Fs);
 
-[yo,Fso] = audioread(audioFileOut);
+
+%% Audio Export
+outSig = cell2mat(v);
+ys=[outSig , y(:,2)];
+audiowrite(audioFileOut,ys,Fs);
+
+%[yo,Fso] = audioread(audioFileOut);
 

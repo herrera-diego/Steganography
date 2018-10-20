@@ -13,7 +13,7 @@ totalSamples = size(yin,1);
 yr=yin(:,1);
 % Number of segments
 
-numSegments = round(yr(totalSamples));
+numSegments = round(yr(totalSamples))*100;
 
 userInputs = string(zeros(numSegments));
 
@@ -35,6 +35,6 @@ for i = 1:numSegments
        metadata(j) = sample(1);        
     end
     
-    userInputs(i) = string(typecast(metadata, 'double'));
+    %userInputs(i) = string(typecast(metadata, 'double'));
 end
 
