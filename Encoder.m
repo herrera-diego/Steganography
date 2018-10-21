@@ -26,6 +26,9 @@ samplesSegment = ceil(totalSamples/numSegments);
 %% Window
 v = mat2cell(y(:,1),diff([0:samplesSegment:totalSamples-1,totalSamples]));
 vo = v;
+
+tdelays = zeros(length(v),1);
+
 for i = 1:length(userInputs)
     
     metadata = char(userInputs(i));
@@ -37,24 +40,24 @@ for i = 1:length(userInputs)
         charBin = dec2bin(charEncoded,8);
 
         for k = 1:length(charBin)  
-        %% Mux
-        vn = v{k,1};   
-        thisBit = char(charBin(k));
-        if(thisBit == '1')
-            %H1(z)
-            t = 2;
-            a = 0.05;            
-        else
-            %H0(z)
-            t = 5;
-            a = 0.001;           
-        end
-        
-        %% Combination
-         h = EncoderTransferFunction(a,t);
-         yk = conv(vn,h);
-         vo{k,1} = yk;
-         % test = conv2olam(vn,h);
+            %% Mux
+            vn = v{k,1};   
+            thisBit = char(charBin(k));
+            if(thisBit == '1')
+                %H1(z)
+                t = 2;
+                a = 0.05;            
+            else
+                %H0(z)
+                t = 5;
+                a = 0.001;           
+            end
+            tdelays(k) = t;
+            %% Combination
+             h = EncoderTransferFunction(a,t);
+             yk = conv(vn,h);
+             vo{k,1} = yk;
+             % test = conv2olam(vn,h);
         end 
         yo = OverlapAdd(vo,length(vn));
     end    
