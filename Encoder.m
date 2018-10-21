@@ -1,10 +1,12 @@
+clear all;
 %% User Inputs
 audioFile = 'AudioDePrueba.wav';
 audioFileOut = 'test.wav';
-title = "Canon Rock";
-artist = "JerryC";
-album = "None";
-userInputs = [title; artist; album];
+title = "CanonRock";
+%artist = "JerryC";
+%album = "None";
+userInputs = title;
+%userInputs = [title; artist; album];
 
 %% Audio Extraction
 [y,Fs] = audioread(audioFile);
@@ -16,7 +18,7 @@ userInputs = [title; artist; album];
 totalSamples = size(y,1);
 
 % Number of segments
-numSegments = 1000;
+numSegments = 10000;
 
 % Block Size
 samplesSegment = ceil(totalSamples/numSegments);
@@ -25,7 +27,7 @@ samplesSegment = ceil(totalSamples/numSegments);
 v = mat2cell(y(:,1),diff([0:samplesSegment:totalSamples-1,totalSamples]));
 vo = v;
 for i = 1:length(userInputs)
-    vn = v{i,1};   
+    
     metadata = char(userInputs(i));
     metadataNum = double(metadata);
 
@@ -36,31 +38,36 @@ for i = 1:length(userInputs)
 
         for k = 1:length(charBin)  
         %% Mux
+        vn = v{k,1};   
         thisBit = char(charBin(k));
-        if(thisBit)
+        if(thisBit == '1')
             %H1(z)
-            t = 5;
-            a = 0;
-            h = createH();
+            t = 2;
+            a = 0.05;            
         else
             %H0(z)
-            t = 1;
-            a = 1;
-            h = createH();
+            t = 5;
+            a = 0.001;           
         end
-
+        
         %% Combination
-
-        end   
+         h = EncoderTransferFunction(a,t);
+         yk = conv(vn,h);
+         vo{k,1} = yk;
+         % test = conv2olam(vn,h);
+        end 
+        yo = OverlapAdd(vo,length(vn));
     end    
 end
 
 
 
 %% Audio Export
-outSig = cell2mat(v);
+outSig = cell2mat(yo);
 ys=[outSig , y(:,2)];
 audiowrite(audioFileOut,ys,Fs);
 
-%[yo,Fso] = audioread(audioFileOut);
 
+
+%[yTest,FsTest] = audioread(audioFileOut);
+%sound(yTest,FsTest);
