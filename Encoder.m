@@ -48,13 +48,13 @@ for i = 1:length(userInputs)
             thisBit = char(charBin(k));
             if(thisBit == '1')
                 %H1(z)
-                timelag = 0.02;
+                timelag = 0.01;
                 delta = round(Fs*timelag);
-                alpha = 0.1;
+                alpha = 0.5;
                 data = 1;
             else
                 %H0(z)
-                timelag = 0.08;
+                timelag = 0.2;
                 delta = round(Fs*timelag);
                 alpha = 0.4;
                 data = 0;
@@ -65,29 +65,34 @@ for i = 1:length(userInputs)
             orig = [vn;zeros(delta,1)];
             echo = [zeros(delta,1);vn]*alpha;
 
-            mtEcho = orig + echo;
-            vo{index,1} = mtEcho(1:samplesSegment);
+            mtEcho = orig + echo;           
+            outEcho = mtEcho(1:samplesSegment) + quotient;
+            vo{index,1} = outEcho;
+            partialData = mtEcho(samplesSegment+1:end);
+            remaingZeros = zeros(samplesSegment-length(partialData),1);
+            quotient = [partialData ; remaingZeros];
             
-%             t = (0:length(mtEcho)-1)/Fs;
-% 
-%             subplot(3,1,1)
-%             plot(t,[orig echo])
-%             legend('Original','Echo')
-% 
-%             subplot(3,1,2)
-%             plot(t,mtEcho)
-%             legend('Total')
-%             xlabel('Time (s)')
+            tl = (0:length(mtEcho)-1)/Fs;
+            t = (0:length(outEcho)-1)/Fs;
+
+            subplot(3,1,1)
+            plot(tl,[orig echo])
+            legend('Original','Echo')
+
+            subplot(3,1,2)
+            plot(t,[outEcho quotient])
+            legend('Total', 'Quotient')
+            xlabel('Time (s)')
             
-%             acf = xcorr(mtEcho);
-%             
-%             c = rceps(acf);
-% 
-%             [px,locs] = findpeaks(c,'Threshold',0.2,'MinPeakDistance',0.2);
-%             ts = [t, 2*t(1:end-1)];
-%             subplot(3,1,3)
-%             plot(ts,c,ts(locs),px,'o')
-%             xlabel('Time (s)')
+            acf = xcorr(outEcho);
+            
+            c = rceps(acf);
+
+            [px,locs] = findpeaks(c,'Threshold',0.2,'MinPeakDistance',0.2);
+            ts = [t, 2*t(1:end-1)];
+            subplot(3,1,3)
+            plot(ts,c,ts(locs),px,'o')
+            xlabel('Time (s)')
 
             index = index + 1;
         end      
