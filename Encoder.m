@@ -1,6 +1,6 @@
 clear all;
 %% User Inputs
-audioFile = 'AudioDePrueba.wav';
+audioFile = 'Canon_Rock.mp3';
 audioFileOut = 'test.wav';
 title = "Canon";
 %artist = "JerryC";
@@ -18,7 +18,7 @@ userInputs = title;
 totalSamples = size(y,1);
 
 % Number of segments
-numSegments = 600;
+numSegments = 1000;
 
 % Block Size
 samplesSegment = ceil(totalSamples/numSegments);
@@ -27,7 +27,7 @@ samplesSegment = ceil(totalSamples/numSegments);
 v = mat2cell(y(:,1),diff([0:samplesSegment:totalSamples-1,totalSamples]));
 vo = v;
 
-tdelays = zeros(length(v),1);
+inDataBits = zeros(length(v),1);
 index = 1;
 data = 0;
 %L = length(v{1,1});
@@ -48,24 +48,47 @@ for i = 1:length(userInputs)
             thisBit = char(charBin(k));
             if(thisBit == '1')
                 %H1(z)
-                t = 100;
-                a = 0.1;   
+                timelag = 0.02;
+                delta = round(Fs*timelag);
+                alpha = 0.1;
                 data = 1;
             else
                 %H0(z)
-                t = 25;
-                a = 0.5; 
+                timelag = 0.08;
+                delta = round(Fs*timelag);
+                alpha = 0.4;
                 data = 0;
             end
-            tdelays(index) = data;
+            inDataBits(index) = data;
             %% Combination
             
-            h = EncoderTransferFunction(a,t);
-            yk = conv(vn,h);
-            vo{index,1} = yk(1:samplesSegment) + quotient;
-            Lx = samplesSegment - length(yk(samplesSegment+1:end)) ;
-            quotient = [yk(samplesSegment+1:end);zeros(Lx,1)];
+            orig = [vn;zeros(delta,1)];
+            echo = [zeros(delta,1);vn]*alpha;
+
+            mtEcho = orig + echo;
+            vo{index,1} = mtEcho(1:samplesSegment);
             
+%             t = (0:length(mtEcho)-1)/Fs;
+% 
+%             subplot(3,1,1)
+%             plot(t,[orig echo])
+%             legend('Original','Echo')
+% 
+%             subplot(3,1,2)
+%             plot(t,mtEcho)
+%             legend('Total')
+%             xlabel('Time (s)')
+            
+%             acf = xcorr(mtEcho);
+%             
+%             c = rceps(acf);
+% 
+%             [px,locs] = findpeaks(c,'Threshold',0.2,'MinPeakDistance',0.2);
+%             ts = [t, 2*t(1:end-1)];
+%             subplot(3,1,3)
+%             plot(ts,c,ts(locs),px,'o')
+%             xlabel('Time (s)')
+
             index = index + 1;
         end      
     end    
