@@ -1,7 +1,15 @@
 clear all;
 %% User Inputs
-audioFile = 'test.wav';
+userInputs = ["user inputs: ";];
 
+audioFile = 'test.wav';
+%end of input
+
+%end of input
+eoi = '\+/';
+
+%end of data, indicates to stop decoding.
+eod = '\*/';
 
 %% Audio Extraction
 [yin,Fs] = audioread(audioFile);
@@ -21,10 +29,7 @@ samplesSegment = ceil(totalSamples/numSegments);
 
 %% Window
 vin = mat2cell(yin(:,1),diff([0:samplesSegment:totalSamples-1,totalSamples]));
-
-
 todelays = zeros(length(vin),1);
-
 c = zeros(8,8);
 charbin="";
 metadaDecoded = "";
@@ -34,12 +39,12 @@ for k = 1:length(vin)
   %% for each window
   vn = vin{k,1};
   rcc = AutoCorrelation(vn);
-  figure();
-  stem(rcc);
+  %figure();
+  %stem(rcc);
   v1 = rcc(50);
   v2 = rcc(65);
   
-  %Decide if it its 1,0 or x
+  %% Decide if it its 1,0 or x
   bit = '';
   if(v1 > v2)
     bit = '0';
@@ -47,31 +52,41 @@ for k = 1:length(vin)
     bit = '1';
   end
   
+  %% concatenate each character
   charbin = strcat(charbin, bit);
-   
+  
+  %% 8 bits
   if(mod(k,8) == 0)
-    a = bin2dec(charbin);
-    c1 = char(a);
-    if(a < 120)
-      metadaDecoded = strcat(metadaDecoded, c1);
+    charDec = bin2dec(charbin);
+    charDecoded = char(charDec);
+    if(charDec == 32)
+        charDecoded = {' '}; 
+    end
+    %% spanish english ascii characters
+    if(charDec< 120)
+      metadaDecoded = strcat(metadaDecoded, charDecoded);
     end
     charbin="";
     indx =  indx +1;
   end
   
-
+  %% split each input
+  if(contains(metadaDecoded,eoi)== true)
+      metadaDecoded = erase(metadaDecoded, eoi);
+      userInputs(length(userInputs)+1) = metadaDecoded;
+      metadaDecoded = '';
+  end
+  
+  %% end of decoding
+  if(contains(metadaDecoded,eod)== true)
+      metadaDecoded = erase(metadaDecoded, eod);
+      break;
+  end
+  
  
 end
-  
-disp(metadaDecoded);
-  
-  
-%% Combination
-for i = 1:length(vin)
-    %vn = vin{i,1};   
-    %[xhat,delay] = cceps(vn);
-    %stem(xhat);
-    %todelays(i) = delay;
-end
 
-%stem(todelays);
+%% Print the metadata decoded
+for i = 1:length(userInputs)
+    disp(userInputs(i));
+end
