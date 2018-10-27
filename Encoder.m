@@ -48,13 +48,13 @@ for i = 1:length(userInputs)
             thisBit = char(charBin(k));
             if(thisBit == '1')
                 %H1(z)
-                timelag = 0.01;
+                timelag = 0.06;
                 delta = round(Fs*timelag);
                 alpha = 0.5;
                 data = 1;
             else
                 %H0(z)
-                timelag = 0.2;
+                timelag = 0.1;
                 delta = round(Fs*timelag);
                 alpha = 0.4;
                 data = 0;
@@ -86,12 +86,12 @@ for i = 1:length(userInputs)
             
             acf = xcorr(outEcho);
             
-            c = rceps(acf);
+            c = rceps(outEcho);
 
             [px,locs] = findpeaks(c,'Threshold',0.2,'MinPeakDistance',0.2);
             ts = [t, 2*t(1:end-1)];
             subplot(3,1,3)
-            plot(ts,c,ts(locs),px,'o')
+            plot(t,c,t(locs),px,'o')
             xlabel('Time (s)')
 
             index = index + 1;
