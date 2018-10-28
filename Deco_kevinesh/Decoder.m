@@ -38,52 +38,53 @@ indx = 1;
 for k = 1:length(vin)
   %% for each window
   vn = vin{k,1};
-  rcc = AutoCorrelation(vn);
-  %figure();
-  %stem(rcc);
-  v1 = rcc(50);
-  v2 = rcc(65);
-  
-  %% Decide if it its 1,0 or x
-  bit = '';
-  if(v1 > v2)
-    bit = '0';
-  else
-    bit = '1';
-  end
-  
-  %% concatenate each character
-  charbin = strcat(charbin, bit);
-  
-  %% 8 bits
-  if(mod(k,8) == 0)
-    charDec = bin2dec(charbin);
-    charDecoded = char(charDec);
-    if(charDec == 32)
-        charDecoded = {' '}; 
-    end
-    %% spanish english ascii characters
-    if(charDec< 120)
-      metadaDecoded = strcat(metadaDecoded, charDecoded);
-    end
-    charbin="";
-    indx =  indx +1;
-  end
-  
-  %% split each input
-  if(contains(metadaDecoded,eoi)== true)
-      metadaDecoded = erase(metadaDecoded, eoi);
-      userInputs(length(userInputs)+1) = metadaDecoded;
-      metadaDecoded = '';
-  end
-  
-  %% end of decoding
-  if(contains(metadaDecoded,eod)== true)
-      metadaDecoded = erase(metadaDecoded, eod);
-      break;
-  end
-  
- 
+  %if(all(vn ~= 0))
+      %% for each window
+      rcc = AutoCorrelation(vn);
+      %figure();
+      %stem(rcc);
+      v1 = rcc(50);
+      v2 = rcc(65);
+
+      %% Decide if it its 1,0 or x
+      bit = '';
+      if(v1 > v2)
+        bit = '0';
+      else
+        bit = '1';
+      end
+
+      %% concatenate each character
+      charbin = strcat(charbin, bit);
+
+      %% 8 bits
+      if(mod(k,8) == 0)
+        charDec = bin2dec(charbin);
+        charDecoded = char(charDec);
+        if(charDec == 32)
+            charDecoded = {' '}; 
+        end
+        %% spanish english ascii characters
+        if(charDec > 31 && charDec < 123)
+          metadaDecoded = strcat(metadaDecoded, charDecoded);
+        end
+        charbin="";
+        indx =  indx +1;
+      end
+
+      %% split each input
+      if(contains(metadaDecoded,eoi)== true)
+          metadaDecoded = erase(metadaDecoded, eoi);
+          userInputs(length(userInputs)+1) = metadaDecoded;
+          metadaDecoded = '';
+      end
+
+      %% end of decoding
+      if(contains(metadaDecoded,eod)== true)
+          metadaDecoded = erase(metadaDecoded, eod);
+          break;
+      end  
+  %end
 end
 
 %% Print the metadata decoded
