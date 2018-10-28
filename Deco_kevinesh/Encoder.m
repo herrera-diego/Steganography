@@ -2,10 +2,16 @@ clear all;
 %% User Inputs
 audioFile = 'Rosa de los vientos.wav';
 audioFileOut = 'test.wav';
-title = "Canon del infierno";
-%artist = "JerryC";
-%album = "None";
-userInputs = title;
+title = "Rosa de vientos";
+artist = "Mago de oz";
+album = "Gaia";
+%end of input
+eoi = '\+/';
+%end of data, indicates to stop decoding.
+eod = '\*/';
+
+userInputs = [title,eoi,artist,eoi,album,eoi,eod];
+
 %userInputs = [title; artist; album];
 
 %% Audio Extraction
@@ -40,16 +46,21 @@ for i = 1:length(userInputs)
     
     for j = 1:length(metadata)
         
-        c= double(metadata(j));
-        b = dec2bin(c,8);
-        %charEncoded = typecast(double(metadata(j)), 'uint8');
+        character = metadata(j);
+        charEncoded= double(character);
+        charbin = dec2bin(charEncoded,8);
+        %charEncoded= typecast(double(metadata(j)), 'uint8');
         %charBin = dec2bin(charEncoded,8);
         
         
-        for k = 1:numel(b)  
+        for k = 1:numel(charbin)
+            %% Verify window out of bounds
+            if(index >= length(v))
+                break;
+            end 
             %% Mux
             vn = v{index,1};   
-            thisBit = char(b(k));
+            thisBit = char(charbin(k));
             if(thisBit == '1')
                 %H1(z)
                 t = 65;
