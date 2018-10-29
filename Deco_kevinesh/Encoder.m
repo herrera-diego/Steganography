@@ -1,10 +1,6 @@
 clear all;
 %% User Inputs
 audioFile = 'Rosa de vientos.wav';
-%audioFile = 'Editus - Dust in the wind.wav';
-%audioFile = 'Mago De Oz - Siempre (Adios Dulcinea. Parte II).wav';
-%audioFile = 'Mein Herz Brennt (Piano Version).wav';
-%audioFile = 'Guns N Roses-November Rain.wav';
 audioFileOut = 'test.wav';
 title = "Rosa de vientos";
 artist = "Mago de oz";
@@ -24,13 +20,6 @@ userInputs = [title,eoi,artist,eoi,album,eoi,eod];
 %sound(y,Fs);
 
 %% System Parameters
-
-% for p = 1:120
-%     disp(p);
-%     disp(char(p));
-% end
-
-
 % Total Samples
 totalSamples = size(y,1);
 
@@ -58,11 +47,7 @@ for i = 1:length(userInputs)
         
         character = metadata(j);
         charEncoded= double(character);
-        charbin = dec2bin(charEncoded,8);
-        %charEncoded= typecast(double(metadata(j)), 'uint8');
-        %charBin = dec2bin(charEncoded,8);
-        
-        
+        charbin = dec2bin(charEncoded,8);   
         for k = 1:numel(charbin)
             %% Verify window out of bounds
             if(index >= length(v))
@@ -101,12 +86,9 @@ for i = 1:length(userInputs)
     end    
 end
 
- %yo = OverlapAdd(vo,length(v{1,1}));
 
 %% Audio Export
 outSig = cell2mat(vo);
-%ys=[outSig , y(:,2)];
 audiowrite(audioFileOut,outSig,Fs);
-
 [yTest,FsTest] = audioread(audioFileOut);
 %sound(yTest,FsTest);

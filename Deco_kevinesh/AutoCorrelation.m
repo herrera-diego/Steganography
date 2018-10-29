@@ -1,5 +1,4 @@
 % funcion de autocorrelacion 
-
 function Rcc = AutoCorrelation(v)
   fourierV = fft(v);
   logaritmoF = log(fourierV);
